@@ -1,0 +1,4 @@
+# How many times longer the day/night cycle should be compared to vanilla.
+# Default: 3  (one full cycle takes 60 real minutes instead of 20)
+# Minimum: 1  (vanilla speed — plugin is effectively a no-op)
+day-length-multiplier: 3

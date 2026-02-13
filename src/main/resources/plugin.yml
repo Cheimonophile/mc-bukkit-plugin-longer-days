@@ -1,0 +1,6 @@
+name: LongerDays
+version: '${project.version}'
+main: com.example.longerdays.LongerDaysPlugin
+api-version: '1.21'
+description: Extends the Minecraft day/night cycle to 3x normal length.
+authors: [ ]
