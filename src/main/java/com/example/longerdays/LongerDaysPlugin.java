@@ -57,7 +57,12 @@ public class LongerDaysPlugin extends JavaPlugin {
                     if (!shouldManageWorld(world)) continue;
 
                     String name = world.getName();
-                    long currentTime = world.getTime();
+                    // Use full time (ever-increasing) rather than time-of-day.
+                    // setTime() secretly jumps fullTime forward by up to 23999 ticks
+                    // when we subtract even 1 tick of day-time, which makes moon
+                    // phases race ahead. setFullTime() controls the absolute counter
+                    // directly so both time-of-day and moon phase slow down together.
+                    long currentTime = world.getFullTime();
 
                     // First time we see this world — record and skip.
                     if (!lastSetTime.containsKey(name)) {
@@ -67,8 +72,9 @@ public class LongerDaysPlugin extends JavaPlugin {
                     }
 
                     // Compare actual time to what we'd expect after one natural tick.
-                    long expected = (lastSetTime.get(name) + 1) % 24000;
-                    long diff = (currentTime - expected + 24000) % 24000;
+                    // fullTime is always increasing so no modular wrap needed.
+                    long expected = lastSetTime.get(name) + 1;
+                    long diff = Math.abs(currentTime - expected);
 
                     if (diff > 2) {
                         // Large jump — sleep skip, /time set, or another plugin.
@@ -83,9 +89,9 @@ public class LongerDaysPlugin extends JavaPlugin {
                     long subtract = (long) acc;
                     corrections.put(name, acc - subtract);
 
-                    long newTime = (currentTime - subtract + 24000) % 24000;
+                    long newTime = currentTime - subtract;
                     if (subtract > 0) {
-                        world.setTime(newTime);
+                        world.setFullTime(newTime);
                     }
                     lastSetTime.put(name, newTime);
                 }
