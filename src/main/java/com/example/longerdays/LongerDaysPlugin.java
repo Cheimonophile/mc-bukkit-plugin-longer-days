@@ -1,5 +1,6 @@
 package com.example.longerdays;
 
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -66,6 +67,16 @@ public class LongerDaysPlugin extends JavaPlugin {
 
                     // First time we see this world — record and skip.
                     if (!lastSetTime.containsKey(name)) {
+                        lastSetTime.put(name, currentTime);
+                        corrections.put(name, 0.0);
+                        continue;
+                    }
+
+                    // If doDayLightCycle is disabled, the game won't advance time,
+                    // so there is nothing to slow down — applying corrections would
+                    // drive time backward. Just track the current time and wait.
+                    Boolean daylightCycle = world.getGameRuleValue(GameRule.DO_DAYLIGHT_CYCLE);
+                    if (Boolean.FALSE.equals(daylightCycle)) {
                         lastSetTime.put(name, currentTime);
                         corrections.put(name, 0.0);
                         continue;
